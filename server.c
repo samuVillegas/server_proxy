@@ -24,9 +24,14 @@
 #define BUF_SIZE        100               /* Buffer rx, tx max size  */
 #define BACKLOG         5                 /* Max. client pending connections  */
 
+
+
+
+
+
 int main(int argc, char* argv[])          /* input arguments are not used */
 { 
-    int sockfd, connfd ;  /* listening socket and connection socket file descriptors */
+    int sockfd;  /* listening socket and connection socket file descriptors */
     unsigned int len;     /* length of client address */
     struct sockaddr_in servaddr, client; 
     
@@ -94,33 +99,27 @@ int main(int argc, char* argv[])          /* input arguments are not used */
       /* Accept the data from incoming sockets in a iterative way */
       while(1)
       {
+        int connfd;
         connfd = accept(sockfd, (struct sockaddr *)&client, &len); 
-        if (connfd < 0) 
-        { 
-            fprintf(stderr, "[SERVER-error]: connection not accepted. %d: %s \n", errno, strerror( errno ));
+        if (connfd < 0){ 
+            printf("[SERVER]: ERROR TO CONNECT WITH CLIENT");
             return -1;
-        } 
-        else
-        {              
-            while(1) /* read data from a client socket till it is closed */ 
-            {  
+        } else{              
+            /* read data from a client socket till it is closed */ 
+            while(1) {  
                 /* read client message, copy it into buffer */
-                len_rx = read(connfd, buff_rx, sizeof(buff_rx));  
-                
-                if(len_rx == -1)
-                {
-                    fprintf(stderr, "[SERVER-error]: connfd cannot be read. %d: %s \n", errno, strerror( errno ));
+                len_rx = read(connfd, buff_rx, sizeof(buff_rx));
+                if(len_rx == -1){
+                    printf("[SERVER]: ERROR READING CLIENT CONTENT");
                 }
-                else if(len_rx == 0) /* if length is 0 client socket closed, then exit */
-                {
+                /* if length is 0 client socket closed, then exit */
+                else if(len_rx == 0) {
                     printf("[SERVER]: client socket closed \n\n");
                     close(connfd);
                     break; 
-                }
-                else
-                {
+                }else{
                     send(connfd, reply, strlen(reply),0);
-                    printf("[SERVER]: %s \n", buff_rx);
+                    printf("%s", buff_rx);
                 }            
             }  
         }                      
